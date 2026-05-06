@@ -25,3 +25,14 @@ dist-ssr
 
 finance-tracker.md
 CLAUDE.md
+.claude/
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
