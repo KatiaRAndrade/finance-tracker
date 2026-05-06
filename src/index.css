@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset/base — define a fonte e fundo do app inteiro.
+   O resto da customização visual fica no Tailwind ou em style inline
+   nos componentes. */
+
+html,
+body,
+#root {
+	background: #0a0a0a;
+	color: #e8e6e3;
+	font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Scrollbar minimalista — combina com o tema dark.
+   Os browsers diferentes têm APIs diferentes, então fazemos os dois. */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.14);
+}
