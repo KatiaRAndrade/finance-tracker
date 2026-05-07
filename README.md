@@ -2,6 +2,8 @@
 
 App de controle financeiro pessoal construído como projeto de portfólio com foco em arquitetura front-end e design patterns em React.
 
+Artigo no Medium: [Design Patterns no Front-end: aprendendo na prática com um app de finanças em React](https://medium.com/@katiareder5/design-patterns-no-front-end-aprendendo-na-prática-com-um-app-de-finanças-em-react-87827c9694dc)
+
 ---
 
 ## Stack
