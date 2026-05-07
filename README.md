@@ -21,12 +21,18 @@ O projeto é organizado por domínio, não por tipo de arquivo.
 
 ```
 src/
+├── components/              
+│   ├── AppShell.tsx         
+│   └── PageHeader.tsx       
+├── context/
+│   └── TransactionContext.tsx
 ├── features/
 │   ├── transactions/
 │   │   ├── transaction.types.ts
 │   │   ├── useTransactions.ts
 │   │   ├── TransactionList.tsx
 │   │   ├── TransactionContainer.tsx
+│   │   ├── TransactionModal.tsx
 │   │   └── FilteredTransactionContainer.tsx
 │   ├── filters/
 │   │   ├── filter.types.ts
@@ -41,8 +47,8 @@ src/
 │       └── DashboardContainer.tsx
 ├── hooks/
 │   └── useLocalStorage.ts
-└── context/
-    └── TransactionContext.tsx
+└── test/
+    └── setup.ts             
 ```
 
 **Por quê:** tipos, hooks e componentes de uma mesma feature vivem juntos. Se a feature de transações fosse extraída pra outro projeto, ela sairia inteira sem dependências espalhadas. Tipos globais ficam numa pasta `types/` na raiz — mas só quando existirem de verdade.
@@ -160,8 +166,7 @@ type Category = keyof typeof CATEGORIES
 ## Testes
 
 ```bash
-npm run test           # watch mode
-npm run test:coverage  # relatório de cobertura
+npm run test          
 ```
 
 **Estratégia por camada:**
@@ -187,19 +192,3 @@ npm run dev
 npm run test
 npm run build
 ```
-
-## Deploy
-
-1. Push pro GitHub
-2. Importar em [vercel.com](https://vercel.com)
-3. Framework preset: **Vite** (detectado automaticamente)
-4. Deploy automático a cada push na `main`
-
----
-
-## Roadmap
-
-- [x] Fase 1 — CRUD de transações + persistência local
-- [x] Fase 2 — Filtros com Compound Component
-- [x] Fase 3 — Dashboard com gráficos (Recharts)
-- [x] Fase 4 — Testes + deploy

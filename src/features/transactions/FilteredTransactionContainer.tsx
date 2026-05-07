@@ -4,53 +4,42 @@ import { Filter } from "../filters/Filter";
 import { TransactionList } from "../transactions/TransactionList";
 import { SummaryCards } from "../dashboard/SummaryCards";
 
-// Esse container orquestra a Fase 2 inteira:
-// pega as transações do contexto global, passa pro useFilters,
-// e distribui os resultados pros componentes apresentacionais.
 export function FilteredTransactionContainer() {
 	const { transactions, remove, summary } = useTransactionContext();
-
-	// useFilters recebe o array bruto e devolve:
-	// - filters: estado atual dos filtros
-	// - setFilter, reset: ações
-	// - filtered: transações já filtradas
-	// - hasActiveFilters: booleano
 	const { filters, setFilter, reset, filtered, hasActiveFilters } =
 		useFilters(transactions);
 
-	// O 'value' que passamos pro Filter é o objeto que os subcomponentes
-	// vão consumir via contexto interno. Montamos ele aqui.
 	const filterContextValue = { filters, setFilter, reset };
 
 	return (
-		<div className="space-y-6">
-			{/* SummaryCards sempre mostra o resumo total — sem filtro.
-          Uma decisão de produto: o saldo real não muda com filtros,
-          só a lista de transações muda. */}
+		<div className="space-y-8">
 			<SummaryCards summary={summary} />
+			<div
+				className="rounded-2xl bg-card"
+				style={{ border: "0.5px solid rgba(255,255,255,0.06)" }}
+			>
+				<div
+					className="flex items-center justify-between px-6 py-4"
+					style={{ borderBottom: "0.5px solid rgba(255,255,255,0.06)" }}
+				>
+					<Filter value={filterContextValue}>
+						<Filter.Type />
+						<Filter.Period />
+						<Filter.Category />
+						<Filter.Reset />
+					</Filter>
 
-			{/* O Compound Component em uso real.
-          Quem usa decide quais filhos e em que ordem. */}
-			<div className="flex items-center justify-between">
-				<Filter value={filterContextValue}>
-					<Filter.Type />
-					<Filter.Period />
-					<Filter.Category />
-					<Filter.Reset />
-				</Filter>
+					{hasActiveFilters && (
+						<span className="text-xs text-white/30 tracking-[0.04em]">
+							{filtered.length} de {transactions.length}
+						</span>
+					)}
+				</div>
 
-				{/* Feedback visual: quantas transações o filtro encontrou */}
-				{hasActiveFilters && (
-					<span className="text-xs text-white/30">
-						{filtered.length} de {transactions.length} transações
-					</span>
-				)}
+				<div className="px-6">
+					<TransactionList items={filtered} onDelete={remove} />
+				</div>
 			</div>
-
-			{/* TransactionList recebe 'filtered' — não 'transactions'.
-          O componente presentational não sabe que existe filtragem.
-          Pra ele, é só um array de itens pra renderizar. */}
-			<TransactionList items={filtered} onDelete={remove} />
 		</div>
 	);
 }

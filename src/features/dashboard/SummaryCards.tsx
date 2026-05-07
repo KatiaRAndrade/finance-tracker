@@ -1,7 +1,3 @@
-// Cards de resumo no estilo fintrack:
-// O card "Saldo Atual" é o herói com gradiente coral.
-// Os outros dois usam tipografia serif e label uppercase.
-
 const formatCurrency = (value: number) =>
 	new Intl.NumberFormat("pt-BR", {
 		style: "currency",
@@ -16,17 +12,12 @@ interface Summary {
 	count: number;
 }
 
-interface SummaryCardsProps {
-	summary: Summary;
-}
-
-export function SummaryCards({ summary }: SummaryCardsProps) {
+export function SummaryCards({ summary }: { summary: Summary }) {
 	const { totalIncome, totalExpenses, balance } = summary;
 	const isPositive = balance >= 0;
 
 	return (
 		<div className="grid grid-cols-3 gap-5">
-			{/* Hero card — gradiente coral com glow circles decorativos */}
 			<div
 				className="relative overflow-hidden rounded-2xl p-6 text-white"
 				style={{
@@ -35,7 +26,6 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 						: "linear-gradient(135deg, #d97a89 0%, #c46b7a 100%)",
 				}}
 			>
-				{/* Glows decorativos — efeito visual sutil */}
 				<div
 					className="absolute pointer-events-none"
 					style={{
@@ -62,22 +52,13 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 				/>
 
 				<div className="relative z-10">
-					<p
-						className="text-[11px] uppercase mb-4"
-						style={{ letterSpacing: "0.16em", color: "rgba(255,255,255,0.85)" }}
-					>
+					<p className="text-[11px] uppercase mb-4 tracking-editorial text-white/85">
 						Saldo Atual
 					</p>
-					<p
-						className="text-[38px] leading-tight"
-						style={{ fontFamily: "'Playfair Display', serif" }}
-					>
+					<p className="text-[38px] leading-tight font-display">
 						{formatCurrency(balance)}
 					</p>
-					<p
-						className="text-xs mt-2"
-						style={{ color: "rgba(255,255,255,0.85)" }}
-					>
+					<p className="text-xs mt-2 text-white/85">
 						{isPositive ? "↑ Saldo positivo" : "↓ Saldo negativo"}
 					</p>
 				</div>
@@ -87,13 +68,13 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
 				label="Receitas"
 				value={formatCurrency(totalIncome)}
 				sub="este mês"
-				subColor="text-emerald-300"
+				subColor="text-income"
 			/>
 			<Card
 				label="Despesas"
 				value={formatCurrency(totalExpenses)}
 				sub="este mês"
-				subColor="text-[#f5a3a3]"
+				subColor="text-coral-light"
 			/>
 		</div>
 	);
@@ -108,17 +89,14 @@ interface CardProps {
 
 function Card({ label, value, sub, subColor }: CardProps) {
 	return (
-		<div className="rounded-2xl p-6 bg-[#141414] border border-white/[0.06]">
-			<p
-				className="text-[11px] uppercase mb-4 text-white/45"
-				style={{ letterSpacing: "0.16em" }}
-			>
+		<div
+			className="rounded-2xl p-6 bg-card"
+			style={{ border: "0.5px solid rgba(255,255,255,0.06)" }}
+		>
+			<p className="text-[11px] uppercase mb-4 text-white/45 tracking-editorial">
 				{label}
 			</p>
-			<p
-				className="text-[38px] leading-tight text-white"
-				style={{ fontFamily: "'Playfair Display', serif" }}
-			>
+			<p className="text-[38px] leading-tight text-white font-display">
 				{value}
 			</p>
 			<p className={`text-xs mt-2 ${subColor}`}>{sub}</p>

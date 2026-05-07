@@ -1,32 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Reset/base — define a fonte e fundo do app inteiro.
-   O resto da customização visual fica no Tailwind ou em style inline
-   nos componentes. */
+@theme {
+  /* Backgrounds */
+  --color-bg:    #0a0a0a;
+  --color-card:  #141414;
+  --color-input: #1a1a1a;
+
+  /* Coral palette */
+  --color-coral:      #e8919c;
+  --color-coral-light: #f5a3a3;
+  --color-coral-warm:  #f0a989;
+
+  /* Income green */
+  --color-income: #86efac;
+
+  /* Typography */
+  --font-display: 'Playfair Display', serif;
+
+  /* Letter spacing */
+  --tracking-editorial: 0.16em;
+}
+
+/* Inputs e selects seguem o tema escuro do sistema — remove o fundo branco
+   no calendário do date picker e na seta do select em browsers Chromium. */
+select,
+input[type="date"] {
+  color-scheme: dark;
+}
 
 html,
 body,
 #root {
-	background: #0a0a0a;
-	color: #e8e6e3;
-	font-family: "Inter", system-ui, sans-serif;
+  background: #0a0a0a;
+  color: #e8e6e3;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-/* Scrollbar minimalista — combina com o tema dark.
-   Os browsers diferentes têm APIs diferentes, então fazemos os dois. */
 ::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-	background: transparent;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-	background: rgba(255, 255, 255, 0.08);
-	border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-	background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.14);
 }

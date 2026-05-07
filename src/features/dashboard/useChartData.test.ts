@@ -1,100 +1,128 @@
-import { renderHook } from '@testing-library/react'
-import { useChartData } from './useChartData'
-import type { Transaction } from '../transactions/transaction.types'
+import { renderHook } from "@testing-library/react";
+import { useChartData } from "./useChartData";
+import type { Transaction } from "../transactions/transaction.types";
 
 const mockTransactions: Transaction[] = [
-  { id: '1', description: 'Salário',  amount: 5000, category: 'income',    type: 'income',  date: '2026-04-10' },
-  { id: '2', description: 'Mercado',  amount: 500,  category: 'food',      type: 'expense', date: '2026-04-15' },
-  { id: '3', description: 'Aluguel',  amount: 1500, category: 'utilities', type: 'expense', date: '2026-04-05' },
-  { id: '4', description: 'Salário',  amount: 5000, category: 'income',    type: 'income',  date: '2026-03-10' },
-  { id: '5', description: 'Mercado',  amount: 400,  category: 'food',      type: 'expense', date: '2026-03-20' },
-]
+	{
+		id: "1",
+		description: "Salário",
+		amount: 5000,
+		category: "income",
+		type: "income",
+		date: "2026-04-10",
+	},
+	{
+		id: "2",
+		description: "Mercado",
+		amount: 500,
+		category: "food",
+		type: "expense",
+		date: "2026-04-15",
+	},
+	{
+		id: "3",
+		description: "Aluguel",
+		amount: 1500,
+		category: "utilities",
+		type: "expense",
+		date: "2026-04-05",
+	},
+	{
+		id: "4",
+		description: "Salário",
+		amount: 5000,
+		category: "income",
+		type: "income",
+		date: "2026-03-10",
+	},
+	{
+		id: "5",
+		description: "Mercado",
+		amount: 400,
+		category: "food",
+		type: "expense",
+		date: "2026-03-20",
+	},
+];
 
-describe('useChartData', () => {
+describe("useChartData", () => {
+	describe("monthlyData", () => {
+		it("deve agrupar transações por mês corretamente", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
 
-  describe('monthlyData', () => {
-    it('deve agrupar transações por mês corretamente', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+			expect(result.current.monthlyData).toHaveLength(2);
+		});
 
-      // 2 meses distintos: março e abril
-      expect(result.current.monthlyData).toHaveLength(2)
-    })
+		it("deve ordenar os meses cronologicamente", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
 
-    it('deve ordenar os meses cronologicamente', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+			const months = result.current.monthlyData.map((d) => d.month);
+			expect(months[0]).toMatch(/mar/i);
+			expect(months[1]).toMatch(/abr/i);
+		});
 
-      const months = result.current.monthlyData.map(d => d.month)
-      // Março deve vir antes de abril
-      expect(months[0]).toMatch(/mar/i)
-      expect(months[1]).toMatch(/abr/i)
-    })
+		it("deve somar receitas e despesas de cada mês", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
+			const abril = result.current.monthlyData[1];
+			expect(abril.income).toBe(5000);
+			expect(abril.expenses).toBe(2000);
+			expect(abril.balance).toBe(3000);
+		});
+	});
 
-    it('deve somar receitas e despesas de cada mês', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+	describe("categoryData", () => {
+		it("deve incluir apenas despesas na distribuição por categoria", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
 
-      // Abril: receita 5000, despesas 500+1500=2000
-      const abril = result.current.monthlyData[1]
-      expect(abril.income).toBe(5000)
-      expect(abril.expenses).toBe(2000)
-      expect(abril.balance).toBe(3000)
-    })
-  })
+			const categoryNames = result.current.categoryData.map((d) => d.name);
+			expect(categoryNames).not.toContain("Receita");
+		});
 
-  describe('categoryData', () => {
-    it('deve incluir apenas despesas na distribuição por categoria', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+		it("deve calcular percentuais que somam 100%", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
 
-      // income (receita) não deve aparecer nas categorias de despesa
-      const categoryNames = result.current.categoryData.map(d => d.name)
-      expect(categoryNames).not.toContain('Receita')
-    })
+			const total = result.current.categoryData.reduce(
+				(acc, d) => acc + d.percentage,
+				0,
+			);
+			expect(total).toBeCloseTo(100, 0);
+		});
 
-    it('deve calcular percentuais que somam 100%', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+		it("deve ordenar categorias do maior para o menor valor", () => {
+			const { result } = renderHook(() => useChartData(mockTransactions));
 
-      const total = result.current.categoryData.reduce(
-        (acc, d) => acc + d.percentage, 0
-      )
-      // Usamos toBeCloseTo por causa de arredondamento de ponto flutuante.
-      // toBe(100) poderia falhar com 99.9999... ou 100.0001...
-      expect(total).toBeCloseTo(100, 0)
-    })
+			const values = result.current.categoryData.map((d) => d.value);
+			for (let i = 0; i < values.length - 1; i++) {
+				expect(values[i]).toBeGreaterThanOrEqual(values[i + 1]);
+			}
+		});
+	});
 
-    it('deve ordenar categorias do maior para o menor valor', () => {
-      const { result } = renderHook(() => useChartData(mockTransactions))
+	describe("recentSummary", () => {
+		it("deve retornar zeros quando não há transações recentes", () => {
+			const old: Transaction[] = [
+				{
+					id: "99",
+					description: "Antiga",
+					amount: 100,
+					category: "food",
+					type: "expense",
+					date: "2020-01-01",
+				},
+			];
 
-      const values = result.current.categoryData.map(d => d.value)
-      // Cada valor deve ser maior ou igual ao próximo
-      for (let i = 0; i < values.length - 1; i++) {
-        expect(values[i]).toBeGreaterThanOrEqual(values[i + 1])
-      }
-    })
-  })
+			const { result } = renderHook(() => useChartData(old));
 
-  describe('recentSummary', () => {
-    it('deve retornar zeros quando não há transações recentes', () => {
-      // Transação no passado distante — fora dos últimos 30 dias
-      const old: Transaction[] = [{
-        id: '99',
-        description: 'Antiga',
-        amount: 100,
-        category: 'food',
-        type: 'expense',
-        date: '2020-01-01',
-      }]
+			expect(result.current.recentSummary.income).toBe(0);
+			expect(result.current.recentSummary.expenses).toBe(0);
+			expect(result.current.recentSummary.savingsRate).toBe(0);
+		});
+	});
 
-      const { result } = renderHook(() => useChartData(old))
+	it("deve retornar arrays vazios sem transações", () => {
+		const { result } = renderHook(() => useChartData([]));
 
-      expect(result.current.recentSummary.income).toBe(0)
-      expect(result.current.recentSummary.expenses).toBe(0)
-      expect(result.current.recentSummary.savingsRate).toBe(0)
-    })
-  })
-
-  it('deve retornar arrays vazios sem transações', () => {
-    const { result } = renderHook(() => useChartData([]))
-
-    expect(result.current.monthlyData).toHaveLength(0)
-    expect(result.current.categoryData).toHaveLength(0)
-  })
-})
+		expect(result.current.monthlyData).toHaveLength(0);
+		expect(result.current.categoryData).toHaveLength(0);
+	});
+});

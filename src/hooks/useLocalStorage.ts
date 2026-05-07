@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-	//lazy initializer - para fazer a chamada apenas uma vez
 	const [storedValue, setStoredValue] = useState<T>(() => {
 		try {
 			const item = localStorage.getItem(key);
@@ -13,11 +12,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 		}
 	});
 
-	//substitui o setState padrão - ele atualiza o react e salva no storage
 	const setValue = (value: T | ((val: T) => T)) => {
-		// Functional update garante que 'prev' é sempre o estado mais recente,
-		// mesmo com múltiplas chamadas em sequência dentro do mesmo act().
-		// Sem isso, value(storedValue) usaria um closure desatualizado.
 		setStoredValue((prev) => {
 			try {
 				const valueToStore = value instanceof Function ? value(prev) : value;
